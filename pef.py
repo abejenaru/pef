@@ -90,9 +90,11 @@ class DistInfo(object):
 @click.command()
 @click.argument('packages', nargs=-1)
 @click.option('-y', '--yes', is_flag=True, help="Don't ask for confirmation of uninstall deletions.")
-def cli(packages, yes):
+@click.option('-f', '--force', is_flag=True, help="Force delete from system environment.")
+@click.option('-v', '--verbose', is_flag=True, help="Verbose output.")
+def cli(packages, yes, force, verbose):
     """Uninstall packages with all its dependencies."""
-    if not _is_venv():
+    if not _is_venv() and not force:
         click.secho(
             click.style("Warning! You are not in an active virtual environment. This may purge system-level packages!",
                         fg='red'))
@@ -118,6 +120,8 @@ def cli(packages, yes):
         cmd = ['uninstall']
         if yes:
             cmd.append('-y')
+        if verbose:
+            cmd.append('-v')
         cmd.extend(list(set(prune)))
         pip.main(cmd)
 
